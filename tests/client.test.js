@@ -88,6 +88,7 @@ describe('routes', () => {
     ['radio artiste', (c) => c.radio({ artistId: 3 }), 'GET', '/api/player/radio?artist_id=3', undefined, '{"seed":{"type":"artist","name":"X"}}'],
     ['accueil', (c) => c.home(200), 'GET', '/api/player/home?smart_limit=200', undefined, '{}'],
     ['accueil sans taille', (c) => c.home(), 'GET', '/api/player/home', undefined, '{}'],
+    ['nouvelles suggestions', (c) => c.refreshSuggestions(), 'POST', '/api/player/home/suggestions', undefined, '{"suggestions":[]}'],
     ['recherche', (c) => c.search('air'), 'GET', '/api/player/search?q=air', undefined, '{}'],
     ['historique', (c) => c.reportPlay('album', 7), 'POST', '/api/player/history', { item_type: 'album', item_id: 7 }, ''],
     ['historique smart', (c) => c.reportSmartPlay('favourites'), 'POST', '/api/player/history', { item_type: 'smart', item_key: 'favourites' }, ''],

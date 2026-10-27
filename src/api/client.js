@@ -109,6 +109,11 @@ export class JewelBoxClient {
     return parsing.parseHome(await this._get('/api/player/home', query));
   }
 
+  /** Nouveau tirage des suggestions du jour (serveur >= 1.21, 404 avant). */
+  async refreshSuggestions() {
+    return parsing.parseSuggestions(await this._post('/api/player/home/suggestions'));
+  }
+
   async search(q) {
     return parsing.parseSearchResults(await this._get('/api/player/search', { q }));
   }

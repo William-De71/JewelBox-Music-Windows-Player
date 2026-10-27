@@ -209,6 +209,11 @@ export function parseHome(data) {
   };
 }
 
+/** POST /api/player/home/suggestions (serveur >= 1.21) : nouveau tirage. */
+export function parseSuggestions(data) {
+  return list(requireObject(data, 'suggestions'), 'suggestions').map(parseAlbum);
+}
+
 export function parseAlbumsPage(data) {
   data = requireObject(data, 'albums');
   const p = isObject(data.pagination) ? data.pagination : {};

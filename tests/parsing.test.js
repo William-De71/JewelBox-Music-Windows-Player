@@ -98,6 +98,10 @@ describe('accueil, recherche, bibliothèque', () => {
     expect(home.recent[0].playlist).toBeNull();
     expect(home.suggestions).toHaveLength(1);
   });
+  it('nouvelles suggestions', () => {
+    expect(parsing.parseSuggestions({ suggestions: [FULL_ALBUM] })).toHaveLength(1);
+    expect(parsing.parseSuggestions({})).toEqual([]);
+  });
   it('recherche', () => {
     const res = parsing.parseSearchResults({ albums: [FULL_ALBUM], tracks: [QUEUE_TRACK] });
     expect(res.albums).toHaveLength(1);

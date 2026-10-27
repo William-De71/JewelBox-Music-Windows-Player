@@ -126,10 +126,12 @@ function RecentTile({ item }) {
   );
 }
 
-function Section({ title, children }) {
+function Section({ title, action, children }) {
   return (
     <section class="home-section">
-      <h2 class="home-section__title">{title}</h2>
+      {action
+        ? <div class="home-section__header"><h2 class="home-section__title">{title}</h2>{action}</div>
+        : <h2 class="home-section__title">{title}</h2>}
       {children}
     </section>
   );
@@ -137,8 +139,10 @@ function Section({ title, children }) {
 
 export function HomePage() {
   const { client, navigation, playback } = useApp();
+  const { toast } = useActions();
   const [rankingSize] = useSetting('smart-ranking-size');
   const [data, setData] = useState(null);
+  const [redrawing, setRedrawing] = useState(false);
   const [error, setError] = useState(null);
   const [attempt, setAttempt] = useState(0);
   const [resumeKey, setResumeKey] = useState(0);
@@ -180,6 +184,19 @@ export function HomePage() {
     return () => window.removeEventListener('focus', onFocus);
   }, []);
 
+  // Bouton « Nouvelles suggestions » : le serveur refait le tirage du jour.
+  const redrawSuggestions = async () => {
+    setRedrawing(true);
+    try {
+      const suggestions = await client.refreshSuggestions();
+      setData((current) => current && { ...current, suggestions });
+    } catch (err) {
+      toast(err.status === 404 ? 'Le serveur JewelBox 1.21 ou plus récent est nécessaire' : 'Impossible de renouveler les suggestions');
+    } finally {
+      setRedrawing(false);
+    }
+  };
+
   if (!client) return <div class="page"><h1 class="page__title">Accueil</h1><NoServer /></div>;
 
   let body;
@@ -217,7 +234,15 @@ export function HomePage() {
           </Section>
         )}
         {data.suggestions.length > 0 && (
-          <Section title="Suggestions">
+          <Section
+            title="Suggestions"
+            action={(
+              <fluent-button appearance="subtle" icon-only aria-label="Nouvelles suggestions" title="Nouvelles suggestions"
+                disabled={redrawing || undefined} onClick={redrawSuggestions}>
+                <Icon name="arrow_clockwise" />
+              </fluent-button>
+            )}
+          >
             <div class="album-grid">{data.suggestions.map((album) => <AlbumCard key={album.id} album={album} onOpen={openAlbum} />)}</div>
           </Section>
         )}
