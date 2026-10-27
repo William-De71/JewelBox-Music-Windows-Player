@@ -1,0 +1,122 @@
+name: Pull request checks
+run-name: PR checks ${{ github.head_ref }}
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Unit tests & coverage (95%)
+    runs-on: ubuntu-latest
+    # Needed by the sticky coverage comment below.
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v7
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          check-latest: true
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: ✅ Run tests with coverage gate (min 95% on logic)
+        run: npm run test:coverage
+
+      - name: 📝 Coverage summary (run page)
+        if: always()
+        run: |
+          node -e "
+            const fs = require('fs');
+            let out;
+            try {
+              const { total } = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+              const row = (k) => '| ' + k + ' | ' + total[k].pct + ' % |';
+              out = ['| | Couverture |', '|---|---|', ...['lines', 'statements', 'branches', 'functions'].map(row)].join('\n');
+            } catch {
+              out = '⚠️ Rapport de couverture indisponible (les tests ont probablement échoué avant).';
+            }
+            fs.writeFileSync('coverage-summary.md', out);
+          "
+          cat coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 💬 Coverage comment (PR, sticky)
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const marker = '<!-- vitest-coverage -->';
+            let table;
+            try {
+              table = fs.readFileSync('coverage-summary.md', 'utf8');
+            } catch {
+              table = '⚠️ Rapport de couverture indisponible.';
+            }
+            const body = `${marker}\n${table}`;
+            const { data: comments } = await github.rest.issues.listComments({
+              ...context.repo, issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.startsWith(marker));
+            if (existing) {
+              await github.rest.issues.updateComment({ ...context.repo, comment_id: existing.id, body });
+            } else {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: context.issue.number, body });
+            }
+
+      - name: ↗️ Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage
+          retention-days: 7
+
+  build-windows:
+    name: Windows build (Rust tests + installer)
+    runs-on: windows-latest
+    needs: test
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v7
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          check-latest: true
+          cache: npm
+
+      - name: 🦀 Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 💾 Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🧪 Rust tests
+        working-directory: src-tauri
+        run: cargo test
+
+      - name: 🏗️ Build installer
+        run: npx tauri build
+
+      - name: ↗️ Upload installer (for manual testing)
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-installer
+          path: src-tauri/target/release/bundle/nsis/*.exe
+          retention-days: 7

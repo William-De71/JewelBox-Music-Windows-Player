@@ -1,0 +1,100 @@
+name: Release Windows
+run-name: Release JewelBox Music Windows Player ${{ github.ref_name }}
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write   # créer la GitHub Release
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Installateur + zip portable
+    runs-on: windows-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v7
+
+      - name: 🟢 Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          check-latest: true
+          cache: npm
+
+      - name: 🦀 Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: 💾 Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      # Le tag doit correspondre aux versions du projet (package.json, lu par
+      # Tauri, et Cargo.toml) : sinon l'installateur porterait une autre version.
+      - name: 🔖 Check version sync
+        shell: bash
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG="$(node -p "require('./package.json').version")"
+          CARGO="$(sed -n 's/^version = "\(.*\)"/\1/p' src-tauri/Cargo.toml | head -1)"
+          echo "tag=$TAG package.json=$PKG Cargo.toml=$CARGO"
+          [[ "$TAG" == "$PKG" && "$TAG" == "$CARGO" ]] || { echo "::error::Versions désynchronisées"; exit 1; }
+
+      - name: ✅ Tests
+        run: npm test
+
+      - name: 🧪 Rust tests
+        working-directory: src-tauri
+        run: cargo test
+
+      - name: 🏗️ Build installer
+        run: npx tauri build
+
+      # Zip portable : l'exécutable seul (le WebView2 est déjà présent sur
+      # Windows 10/11), réglages et file de lecture rangés dans le profil.
+      - name: 📦 Assemble release files
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}"
+          New-Item -ItemType Directory -Force -Path dist-release | Out-Null
+          $setup = Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe | Select-Object -First 1
+          Copy-Item $setup.FullName "dist-release/JewelBox-Music-Windows-Player-$version-setup.exe"
+          $portable = "portable/JewelBox-Music-Player"
+          New-Item -ItemType Directory -Force -Path $portable | Out-Null
+          Copy-Item src-tauri/target/release/JewelBox.exe "$portable/JewelBox.exe"
+          Copy-Item LICENSE "$portable/LICENSE.txt"
+          Compress-Archive -Path "$portable/*" -DestinationPath "dist-release/JewelBox-Music-Windows-Player-$version-portable.zip"
+          Get-ChildItem dist-release
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist-release/*
+          generate_release_notes: true
+          body: |
+            ## 🪟 JewelBox Music Windows Player ${{ github.ref_name }}
+
+            Client de streaming Windows 10/11 (x64) du serveur JewelBox Music Library.
+
+            ### Installateur — recommandé
+            Téléchargez `JewelBox-Music-Windows-Player-${{ github.ref_name }}-setup.exe` et lancez-le :
+            installation pour l'utilisateur courant, sans droits administrateur, raccourci dans le menu Démarrer.
+            Les mises à jour s'installent par-dessus, réglages conservés.
+
+            ### Zip portable
+            Décompressez `JewelBox-Music-Windows-Player-${{ github.ref_name }}-portable.zip` où vous voulez
+            et lancez `JewelBox.exe`. Rien n'est installé ; les réglages restent dans votre profil Windows.
+
+            > L'application n'est pas signée : au premier lancement, Windows SmartScreen peut afficher
+            > « Windows a protégé votre ordinateur » → **Informations complémentaires** → **Exécuter quand même**.

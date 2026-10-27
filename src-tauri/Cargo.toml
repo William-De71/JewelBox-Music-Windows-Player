@@ -1,0 +1,29 @@
+[package]
+name = "jewelbox"
+version = "0.1.0"
+description = "JewelBox Music Player pour Windows"
+authors = ["William Deren"]
+license = "MIT"
+repository = "https://github.com/William-De71/JewelBox-Music-Windows-Player"
+edition = "2024"
+rust-version = "1.90"
+
+[lib]
+name = "jewelbox_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.7.4", features = [] }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.12.5", features = ["image-png", "tray-icon"] }
+tauri-plugin-log = "2"
+tauri-plugin-single-instance = "2.5.4"
+tauri-plugin-notification = "2.7.0"
+tauri-plugin-window-state = "2.5.0"
+
+[target."cfg(windows)".dependencies]
+windows-version = "0.1.7"
