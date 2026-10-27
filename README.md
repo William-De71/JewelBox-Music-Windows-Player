@@ -7,6 +7,14 @@ serveur sur le réseau local. Mêmes fonctions que le
 [lecteur bureau Linux](https://github.com/William-De71/JewelBox-Music-Desktop-Player),
 avec l'apparence d'une application Windows 11.
 
+![Grand lecteur avec la file d'attente](docs/screenshots/player.png)
+
+| Accueil | Bibliothèque | Fiche album |
+| --- | --- | --- |
+| ![Accueil (thème sombre)](docs/screenshots/home.png) | ![Bibliothèque (thème clair)](docs/screenshots/library.png) | ![Fiche album (thème clair)](docs/screenshots/album.png) |
+
+Le thème clair ou sombre suit celui de Windows.
+
 ## Stack
 
 - **Application** : [Tauri 2](https://tauri.app) (WebView2), côté natif en Rust
