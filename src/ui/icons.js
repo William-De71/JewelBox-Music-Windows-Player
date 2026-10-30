@@ -57,6 +57,8 @@ import EditRegular from '@fluentui/svg-icons/icons/edit_20_regular.svg?raw';
 import EditFilled from '@fluentui/svg-icons/icons/edit_20_filled.svg?raw';
 import DismissRegular from '@fluentui/svg-icons/icons/dismiss_20_regular.svg?raw';
 import DismissFilled from '@fluentui/svg-icons/icons/dismiss_20_filled.svg?raw';
+import ProhibitedRegular from '@fluentui/svg-icons/icons/prohibited_20_regular.svg?raw';
+import ProhibitedFilled from '@fluentui/svg-icons/icons/prohibited_20_filled.svg?raw';
 import AlbumRegular from '@fluentui/svg-icons/icons/album_20_regular.svg?raw';
 import AlbumFilled from '@fluentui/svg-icons/icons/album_20_filled.svg?raw';
 import MusicNote2Regular from '@fluentui/svg-icons/icons/music_note_2_20_regular.svg?raw';
@@ -147,6 +149,8 @@ export const ICONS = {
   'edit:filled': EditFilled,
   'dismiss': DismissRegular,
   'dismiss:filled': DismissFilled,
+  'prohibited': ProhibitedRegular,
+  'prohibited:filled': ProhibitedFilled,
   'album': AlbumRegular,
   'album:filled': AlbumFilled,
   'music_note_2': MusicNote2Regular,

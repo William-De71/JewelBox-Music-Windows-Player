@@ -4,7 +4,7 @@
 // en best-effort de récupérer server_id ; « Tester » interroge /api/health
 // sans rien persister.
 
-import { useState } from 'preact/hooks';
+import { useEffect, useState } from 'preact/hooks';
 
 import { useOverlays } from '../app/overlays.jsx';
 import { ShortcutsDialog } from '../ui/ShortcutsDialog.jsx';
@@ -13,6 +13,7 @@ import { ApiError, JewelBoxClient } from '../api/client.js';
 import { useApp, useSetting } from '../app/context.jsx';
 import { TRANSITION_FADE_CHOICES } from '../core/transitionFade.js';
 import { Dropdown, SettingCard, Switch, TextInput } from '../ui/controls.jsx';
+import { Dialog } from '../ui/Dialog.jsx';
 import { Icon } from '../ui/Icon.jsx';
 
 const RANKING_SIZES = [50, 100, 200, 500, 1000];
@@ -169,7 +170,64 @@ function PlaybackSection() {
           onChange={(next) => setFade(Number(next))}
         />
       </SettingCard>
+      <MixBlocklistCard />
     </section>
+  );
+}
+
+// Liste noire du mix dynamique (« Ne plus jamais jouer »), gardée par le
+// serveur pour tous les appareils : combien de titres, et de quoi la vider.
+function MixBlocklistCard() {
+  const { client } = useApp();
+  const { openDialog, toast } = useOverlays();
+  const [count, setCount] = useState(null);
+
+  useEffect(() => {
+    if (!client) return undefined;
+    let cancelled = false;
+    client.dynamicMixBlocked()
+      .then((tracks) => !cancelled && setCount(tracks.length))
+      .catch(() => !cancelled && setCount(null));
+    return () => { cancelled = true; };
+  }, [client]);
+
+  async function clear() {
+    try {
+      await client.dynamicMixClearBlocked();
+      setCount(0);
+      toast('Liste noire vidée');
+    } catch {
+      toast('Impossible de vider la liste noire');
+    }
+  }
+
+  const confirm = () => openDialog((close) => (
+    <Dialog
+      title="Vider la liste noire ?"
+      onClose={close}
+      footer={(
+        <>
+          <fluent-button appearance="primary" class="button--danger" onClick={() => { close(); clear(); }}>Vider</fluent-button>
+          <fluent-button onClick={close}>Annuler</fluent-button>
+        </>
+      )}
+    >
+      <p class="dialog__description">Tous les titres exclus pourront de nouveau être tirés dans le mix dynamique.</p>
+    </Dialog>
+  ));
+
+  let status = 'Indisponible (serveur 1.22 ou plus requis)';
+  if (count === 0) status = 'Aucun titre exclu';
+  else if (count) status = count === 1 ? '1 titre exclu' : `${count} titres exclus`;
+
+  return (
+    <SettingCard
+      icon={<Icon name="prohibited" />} title="Mix dynamique : titres exclus"
+      description="Les titres marqués « Ne plus jamais jouer » ne sont plus tirés dans le mix, sur tous vos appareils."
+    >
+      <span class="muted">{status}</span>
+      <fluent-button disabled={!count || undefined} onClick={confirm}>Vider</fluent-button>
+    </SettingCard>
   );
 }
 
