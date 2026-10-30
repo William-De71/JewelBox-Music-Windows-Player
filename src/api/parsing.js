@@ -177,6 +177,10 @@ export function parseDynamicMixPlayed(data) {
   return { removed: bool(data, 'removed'), tracks: list(data, 'tracks').map(parseQueueTrack) };
 }
 
+export function parseDynamicMixBlocked(data) {
+  return list(requireObject(data, 'dynamic-mix-blocked'), 'data').map(parseQueueTrack);
+}
+
 export function parseSearchResults(data) {
   data = requireObject(data, 'search');
   return {

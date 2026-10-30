@@ -207,6 +207,19 @@ export class JewelBoxClient {
     return parsing.parseDynamicMixPlayed(await this._delete(`/api/smart-playlists/dynamic_mix/tracks/${trackId}`));
   }
 
+  // « Ne plus jamais jouer » : liste noire du mix (serveur >= 1.22 ; 404 avant).
+  async dynamicMixBlock(trackId) {
+    return parsing.parseDynamicMixPlayed(await this._post('/api/smart-playlists/dynamic_mix/blocked', { track_id: trackId }));
+  }
+
+  async dynamicMixBlocked() {
+    return parsing.parseDynamicMixBlocked(await this._get('/api/smart-playlists/dynamic_mix/blocked'));
+  }
+
+  async dynamicMixClearBlocked() {
+    await this._delete('/api/smart-playlists/dynamic_mix/blocked');
+  }
+
   // ── File partagée entre appareils (X-Device-Id) ────────────────────────────
 
   async saveQueue({ trackIds, currentIndex, positionSec, deviceLabel, sourceLabel = null }) {

@@ -1,6 +1,7 @@
 // Fiche d'une liste intelligente (portage de ui/smart_playlist_detail.py),
-// en lecture seule ; le mix dynamique ajoute « Relancer un mix complet » et
-// « Retirer du mix », et suit les rotations faites pendant la lecture.
+// en lecture seule ; le mix dynamique ajoute « Relancer un mix complet »,
+// « Retirer du mix » et « Ne plus jamais jouer », et suit les rotations faites
+// pendant la lecture.
 
 import { useEffect, useState } from 'preact/hooks';
 
@@ -10,13 +11,14 @@ import { DYNAMIC_MIX_KEY } from '../core/dynamicMix.js';
 import { smartSpec } from '../core/smartSpecs.js';
 import { EmptyState } from '../ui/EmptyState.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { MenuButton } from '../ui/Menu.jsx';
 import { playableIndex, QueueTrackRow } from '../ui/QueueTrackRow.jsx';
 
 const pistes = (n) => (n === 1 ? '1 piste' : `${n} pistes`);
 
 export function SmartPlaylistDetailPage({ smartKey }) {
   const { client, playback } = useApp();
-  const { addToPlaylist, queueEntries, toggleTrackFavorite } = useActions();
+  const { addToPlaylist, queueEntries, toggleTrackFavorite, toast } = useActions();
   const [rankingSize] = useSetting('smart-ranking-size');
   const playbackState = usePlaybackState();
   const [tracks, setTracks] = useState(null);
@@ -56,7 +58,16 @@ export function SmartPlaylistDetailPage({ smartKey }) {
       const result = await call();
       setTracks(result.tracks);
       if (syncQueue) playback.syncDynamicMix(result.tracks, { yankCurrent: true });
-    } catch { /* affichage inchangé */ }
+      return true;
+    } catch (error) {
+      return error; // affichage inchangé
+    }
+  }
+
+  async function blockTrack(trackId) {
+    const result = await runMix(() => client.dynamicMixBlock(trackId), true);
+    if (result === true) toast('Ce titre ne sera plus joué dans le mix');
+    else toast(result?.status === 404 ? 'Liste noire indisponible : mettez le serveur à jour' : 'Action impossible');
   }
 
   const setFavorite = (trackId, value) => setTracks((current) => current?.map((t) => (t.id === trackId ? { ...t, isFavorite: value } : t)));
@@ -95,10 +106,10 @@ export function SmartPlaylistDetailPage({ smartKey }) {
             onPlay={() => play(playableIndex(tracks, index))}
             onFavorite={(t) => toggleTrackFavorite(t, setFavorite)}
             trailing={isDynamic && (
-              <button type="button" class="icon-button" aria-label="Retirer du mix" title="Retirer du mix"
-                onClick={() => runMix(() => client.dynamicMixRemove(track.id), true)}>
-                <Icon name="dismiss" />
-              </button>
+              <MenuButton icon="dismiss" label="Retirer du mix" entries={[
+                { label: 'Retirer du mix', icon: 'dismiss', onSelect: () => runMix(() => client.dynamicMixRemove(track.id), true) },
+                { label: 'Ne plus jamais jouer', icon: 'prohibited', onSelect: () => blockTrack(track.id) },
+              ]} />
             )}
             entries={queueEntries({
               onPlayNext: () => playback.enqueueTracks([track], { playNext: true }),
