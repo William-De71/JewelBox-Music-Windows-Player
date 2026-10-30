@@ -1,7 +1,7 @@
 {
   "name": "jewelbox-windows-player",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "JewelBox Music Player pour Windows (Tauri + Preact + Fluent UI)",
   "type": "module",
   "license": "MIT",
