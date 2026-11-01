@@ -3,6 +3,8 @@
 
 import { useEffect, useState } from 'preact/hooks';
 
+import { simpleCommand } from '../core/remoteController.js';
+import { useActions } from './actions.jsx';
 import { useApp } from './context.jsx';
 import { useOverlays } from './overlays.jsx';
 
@@ -37,5 +39,24 @@ export function useRemoteSend() {
         return false;
       },
     );
+  };
+}
+
+// « Écouter ici » : joue la file de ce lecteur sur ce poste, à sa piste et à
+// sa position du moment, le met en pause là-bas, puis ouvre le grand lecteur
+// à la place des pages de télécommande.
+export function useListenHere() {
+  const { client, navigation } = useApp();
+  const { resumeDevice, toast } = useActions();
+  return async (device) => {
+    const state = device.state;
+    if (await resumeDevice(device, state) !== 'ok') {
+      toast('Impossible de reprendre cette lecture ici');
+      return;
+    }
+    if (state?.playbackState === 'playing') {
+      await client.remoteCommand(device.deviceId, simpleCommand('pause')).catch(() => {});
+    }
+    navigation.pushReplacing({ kind: 'player' }, ['remote', 'remote-device', 'player']);
   };
 }

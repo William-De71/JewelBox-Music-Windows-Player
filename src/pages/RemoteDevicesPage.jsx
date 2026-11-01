@@ -2,7 +2,7 @@
 // clic ouvre leur télécommande. Portage de RemoteDevicesPage (ui/remote.py).
 
 import { useApp } from '../app/context.jsx';
-import { useRemoteDevices, useRemoteSend } from '../app/remote.jsx';
+import { useListenHere, useRemoteDevices, useRemoteSend } from '../app/remote.jsx';
 import { deviceIcon, deviceName, simpleCommand } from '../core/remoteController.js';
 import { Cover } from '../ui/Cover.jsx';
 import { EmptyState, NoServer } from '../ui/EmptyState.jsx';
@@ -13,6 +13,7 @@ const STATE_LABELS = { playing: 'En lecture', paused: 'En pause' };
 function DeviceCard({ device }) {
   const { client, navigation } = useApp();
   const send = useRemoteSend();
+  const listenHere = useListenHere();
   const state = device.state;
   const track = state?.track;
   const playing = state?.playbackState === 'playing';
@@ -31,6 +32,12 @@ function DeviceCard({ device }) {
         </span>
         <span class="remote-device__state">{STATE_LABELS[state?.playbackState] ?? 'À l’arrêt'}</span>
       </span>
+      {track && (
+        <button type="button" class="icon-button" aria-label="Écouter ici" title="Écouter ici"
+          onClick={(event) => { event.stopPropagation(); listenHere(device); }}>
+          <Icon name="headphones" />
+        </button>
+      )}
       {track && (
         <button type="button" class="icon-button" aria-label={playing ? 'Pause' : 'Lecture'} title={playing ? 'Pause' : 'Lecture'}
           onClick={(event) => { event.stopPropagation(); send(device.deviceId, simpleCommand('toggle')); }}>

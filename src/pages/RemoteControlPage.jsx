@@ -6,7 +6,7 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 import { useApp } from '../app/context.jsx';
-import { useRemoteDevices, useRemoteSend } from '../app/remote.jsx';
+import { useListenHere, useRemoteDevices, useRemoteSend } from '../app/remote.jsx';
 import {
   deviceName, livePosition, muteCommand, nextRepeat, playIndexCommand, repeatCommand,
   seekCommand, shuffleCommand, simpleCommand, volumeCommand,
@@ -52,6 +52,7 @@ export function RemoteControlPage({ deviceId }) {
   const { client } = useApp();
   const devices = useRemoteDevices();
   const send = useRemoteSend();
+  const listenHere = useListenHere();
   const now = useNow(500);
   const device = devices?.find((d) => d.deviceId === deviceId) ?? null;
   const state = device?.state ?? null;
@@ -151,6 +152,12 @@ export function RemoteControlPage({ deviceId }) {
               onMuted={(muted) => can('mute') && command(muteCommand(muted))}
             />
           </div>
+        )}
+        {track && (
+          <fluent-button onClick={() => listenHere(device)}>
+            <span slot="start"><Icon name="headphones" size={16} /></span>
+            Écouter ici
+          </fluent-button>
         )}
       </section>
       {tracks.length > 0 && (

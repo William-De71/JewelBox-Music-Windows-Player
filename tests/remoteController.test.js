@@ -3,7 +3,8 @@ import { JewelBoxClient } from '../src/api/client.js';
 import { parseRemoteDevice } from '../src/api/parsing.js';
 import {
   applyWatchEvent, controllableOthers, deviceIcon, deviceName, livePosition, muteCommand, nextRepeat,
-  playIndexCommand, playMediaCommand, repeatCommand, seekCommand, shuffleCommand, simpleCommand, volumeCommand,
+  playIndexCommand, playMediaCommand, repeatCommand, seekCommand, shuffleCommand, simpleCommand, takeOverQueue,
+  volumeCommand,
 } from '../src/core/remoteController.js';
 
 const DESK = {
@@ -71,6 +72,37 @@ describe('livePosition', () => {
     expect(livePosition({ ...playing, playbackState: 'paused' }, at + 10000)).toBe(60);
     expect(livePosition({ ...playing, reportedAt: 'hier' }, at + 10000)).toBe(60);
     expect(livePosition({ ...playing, reportedAt: null }, at + 10000)).toBe(60);
+  });
+});
+
+describe('takeOverQueue', () => {
+  const reported = '2026-10-31T13:34:22.588Z';
+  const at = Date.parse(reported);
+  const queue = {
+    deviceId: 'desk', currentIndex: 0, positionSec: 5,
+    tracks: [7, 8, 9].map((id) => ({ id, title: `T${id}`, hasFile: true })),
+  };
+  const live = {
+    playbackState: 'playing', positionSec: 60, durationSec: 200, currentIndex: 1, trackId: 8, reportedAt: reported,
+  };
+
+  it('« Écouter ici » part de la piste et de la position en direct', () => {
+    const taken = takeOverQueue(queue, live, at + 10000);
+    expect(taken.currentIndex).toBe(1);
+    expect(taken.positionSec).toBeCloseTo(70);
+    expect(taken.tracks).toBe(queue.tracks);
+  });
+
+  it('index en direct décalé, mais celui enregistré colle', () => {
+    const taken = takeOverQueue(queue, { ...live, currentIndex: 2, trackId: 7 }, at);
+    expect(taken.currentIndex).toBe(0);
+    expect(taken.positionSec).toBeCloseTo(60);
+  });
+
+  it('piste inconnue de la file enregistrée, ou pas d’état : telle quelle', () => {
+    expect(takeOverQueue(queue, { ...live, trackId: 42 }, at)).toBe(queue);
+    expect(takeOverQueue(queue, { ...live, trackId: null }, at)).toBe(queue);
+    expect(takeOverQueue(queue, null, at)).toBe(queue);
   });
 });
 
