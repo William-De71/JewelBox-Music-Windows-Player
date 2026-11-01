@@ -8,6 +8,7 @@ import { useActions } from '../app/actions.jsx';
 import { useApp, usePlaybackState } from '../app/context.jsx';
 import { EmptyState } from '../ui/EmptyState.jsx';
 import { Icon } from '../ui/Icon.jsx';
+import { PlayOnButton } from '../ui/PlayOnButton.jsx';
 import { ConfirmDelete, TextPrompt } from '../ui/Prompts.jsx';
 import { playableIndex, QueueTrackRow } from '../ui/QueueTrackRow.jsx';
 
@@ -92,6 +93,7 @@ export function PlaylistDetailPage({ playlistId }) {
                 <span class="button-text">{playingThis && playbackState.isPlaying ? 'Pause' : 'Écouter'}</span>
               </fluent-button>
             )}
+            {tracks.some((t) => t.hasFile) && <PlayOnButton type="playlist" id={playlist.id} />}
             <fluent-button onClick={rename}><Icon name="rename" /><span class="button-text">Renommer</span></fluent-button>
             <fluent-button onClick={remove}><Icon name="delete" /><span class="button-text">Supprimer</span></fluent-button>
           </div>

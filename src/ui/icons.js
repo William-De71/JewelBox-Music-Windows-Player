@@ -89,6 +89,16 @@ import StarEmphasisRegular from '@fluentui/svg-icons/icons/star_emphasis_20_regu
 import StarEmphasisFilled from '@fluentui/svg-icons/icons/star_emphasis_20_filled.svg?raw';
 import ArrowSyncRegular from '@fluentui/svg-icons/icons/arrow_sync_20_regular.svg?raw';
 import ArrowSyncFilled from '@fluentui/svg-icons/icons/arrow_sync_20_filled.svg?raw';
+import PhoneDesktopRegular from '@fluentui/svg-icons/icons/phone_desktop_20_regular.svg?raw';
+import PhoneDesktopFilled from '@fluentui/svg-icons/icons/phone_desktop_20_filled.svg?raw';
+import PhoneRegular from '@fluentui/svg-icons/icons/phone_20_regular.svg?raw';
+import PhoneFilled from '@fluentui/svg-icons/icons/phone_20_filled.svg?raw';
+import DesktopRegular from '@fluentui/svg-icons/icons/desktop_20_regular.svg?raw';
+import DesktopFilled from '@fluentui/svg-icons/icons/desktop_20_filled.svg?raw';
+import GlobeRegular from '@fluentui/svg-icons/icons/globe_20_regular.svg?raw';
+import GlobeFilled from '@fluentui/svg-icons/icons/globe_20_filled.svg?raw';
+import CastRegular from '@fluentui/svg-icons/icons/cast_20_regular.svg?raw';
+import CastFilled from '@fluentui/svg-icons/icons/cast_20_filled.svg?raw';
 import RenameRegular from '@fluentui/svg-icons/icons/rename_20_regular.svg?raw';
 import RenameFilled from '@fluentui/svg-icons/icons/rename_20_filled.svg?raw';
 
@@ -183,4 +193,14 @@ export const ICONS = {
   'arrow_sync:filled': ArrowSyncFilled,
   'rename': RenameRegular,
   'rename:filled': RenameFilled,
+  'phone_desktop': PhoneDesktopRegular,
+  'phone_desktop:filled': PhoneDesktopFilled,
+  'phone': PhoneRegular,
+  'phone:filled': PhoneFilled,
+  'desktop': DesktopRegular,
+  'desktop:filled': DesktopFilled,
+  'globe': GlobeRegular,
+  'globe:filled': GlobeFilled,
+  'cast': CastRegular,
+  'cast:filled': CastFilled,
 };

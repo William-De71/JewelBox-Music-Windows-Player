@@ -11,6 +11,7 @@ import { EmptyState } from '../ui/EmptyState.jsx';
 import { Cover } from '../ui/Cover.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { MenuButton } from '../ui/Menu.jsx';
+import { PlayOnButton } from '../ui/PlayOnButton.jsx';
 
 function TrackRow({ album, track, isCurrent, isPlaying, onFavorite }) {
   const { playback } = useApp();
@@ -147,6 +148,7 @@ export function AlbumDetailPage({ albumId }) {
                   onAddToPlaylist: () => addToPlaylist({ albumId: album.id }),
                 })}
               />
+              <PlayOnButton type="album" id={album.id} />
             </div>
           )}
         </div>

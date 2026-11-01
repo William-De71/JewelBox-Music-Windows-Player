@@ -292,3 +292,47 @@ export function parseGenres(data) {
   }
   return genres;
 }
+
+// État en direct qu'un lecteur a rapporté (télécommande) ; la piste courante,
+// résolue par le serveur, est au format QueueTrack.
+export function parseRemoteState(data) {
+  data = requireObject(data, 'remote-state');
+  let track = null;
+  if (isObject(data.track)) {
+    try {
+      track = parseQueueTrack(data.track);
+    } catch (error) {
+      if (!(error instanceof ParseError)) throw error;
+    }
+  }
+  return {
+    playbackState: str(data, 'playback_state', 'idle'),
+    positionSec: isNumber(data.position_sec) ? data.position_sec : 0,
+    durationSec: isNumber(data.duration_sec) ? data.duration_sec : 0,
+    currentIndex: int(data, 'current_index', -1),
+    trackId: optInt(data, 'track_id'),
+    volume: isNumber(data.volume) ? Math.round(data.volume) : null,
+    muted: typeof data.muted === 'boolean' ? data.muted : null,
+    shuffle: typeof data.shuffle === 'boolean' ? data.shuffle : null,
+    repeat: optStr(data, 'repeat'),
+    track,
+    reportedAt: optStr(data, 'reported_at'),
+  };
+}
+
+// Un lecteur vu par le serveur (GET /api/player/remote/devices et le flux
+// /api/player/remote/watch). Seul un lecteur controllable accepte des ordres.
+export function parseRemoteDevice(data) {
+  data = requireObject(data, 'remote-device');
+  return {
+    deviceId: reqStr(data, 'device_id', 'remote-device'),
+    deviceLabel: optStr(data, 'device_label'),
+    controllable: bool(data, 'controllable'),
+    capabilities: list(data, 'capabilities').filter((c) => typeof c === 'string'),
+    state: isObject(data.state) ? parseRemoteState(data.state) : null,
+  };
+}
+
+export function parseRemoteDevices(data) {
+  return list(requireObject(data, 'remote-devices'), 'data').map(parseRemoteDevice);
+}
