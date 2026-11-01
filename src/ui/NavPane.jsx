@@ -33,6 +33,9 @@ export function NavPane() {
   const { navigation, client } = useApp();
   const { openDialog, resumeDevice } = useActions();
   const openResume = () => openDialog((close) => <ResumeDialog client={client} resumeDevice={resumeDevice} onClose={close} />);
+  // Télécommande des autres lecteurs, empilée sur l'onglet courant.
+  const remoteOpen = navigation.page?.kind === 'remote' || navigation.page?.kind === 'remote-device';
+  const openRemote = () => !remoteOpen && navigation.push({ kind: 'remote' });
   return (
     <nav class="nav-pane" aria-label="Navigation">
       <div class="nav-pane__items">
@@ -41,6 +44,11 @@ export function NavPane() {
         ))}
       </div>
       <div class="nav-pane__footer">
+        <button type="button" class={`nav-item ${remoteOpen ? 'nav-item--active' : ''}`} title="Contrôler un autre appareil"
+          aria-current={remoteOpen ? 'page' : undefined} onClick={openRemote}>
+          <Icon name="phone_desktop" filled={remoteOpen} />
+          <span class="nav-item__label">Appareils</span>
+        </button>
         <button type="button" class="nav-item" title="Reprendre depuis un autre appareil…" onClick={openResume}>
           <Icon name="phone_laptop" />
           <span class="nav-item__label">Reprendre…</span>

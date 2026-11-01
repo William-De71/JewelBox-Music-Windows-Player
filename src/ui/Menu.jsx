@@ -1,11 +1,11 @@
 // Menu contextuel façon Windows 11, ouvert par un bouton : entrées
-// { label, icon?, onSelect } ; null insère un séparateur. Se ferme au clic
+// { label, icon?, disabled?, onSelect } ; null insère un séparateur. Se ferme au clic
 // ailleurs, sur Échap ou après un choix.
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'preact/hooks';
 import { Icon } from './Icon.jsx';
 
-export function MenuButton({ entries, icon = 'more_horizontal', label = 'Plus d’actions', text, appearance = 'subtle', class: className = '' }) {
+export function MenuButton({ entries, icon = 'more_horizontal', label = 'Plus d’actions', text, appearance = 'subtle', class: className = '', onOpen }) {
   const [open, setOpen] = useState(false);
   const [position, setPosition] = useState(null);
   const buttonRef = useRef(null);
@@ -49,7 +49,12 @@ export function MenuButton({ entries, icon = 'more_horizontal', label = 'Plus d�
         aria-haspopup="menu"
         aria-expanded={open ? 'true' : 'false'}
         class={className}
-        onClick={(event) => { event.stopPropagation(); setOpen((v) => !v); }}
+        onClick={(event) => {
+          event.stopPropagation();
+          // onOpen : de quoi remplir le menu à son ouverture (liste chargée à la demande).
+          if (!open) onOpen?.();
+          setOpen(!open);
+        }}
       >
         <Icon name={icon} />
         {text && <span class="button-text">{text}</span>}

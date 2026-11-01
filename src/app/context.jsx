@@ -13,6 +13,7 @@ import { createSettings } from '../core/settings.js';
 import { AudioPlayer } from '../playback/player.js';
 import { QueueSync } from '../playback/queueSync.js';
 import { RemoteControl } from '../playback/remoteControl.js';
+import { RemoteWatch } from '../playback/remoteWatch.js';
 import { PlaybackSession } from '../playback/session.js';
 
 const AppContext = createContext(null);
@@ -115,10 +116,18 @@ export function AppProvider({ settings: injected, playback: injectedPlayback, ch
       control.stop();
     };
   }, [playback, settings]);
-  // Nouveau serveur : le flux est rouvert vers lui.
+  // Télécommande des autres lecteurs : un seul flux des lecteurs, ouvert tant
+  // qu'une page de télécommande s'affiche (voir app/remote.jsx).
+  const remoteWatch = useMemo(() => new RemoteWatch({
+    getClient: () => clientRef.current,
+    getDeviceId: () => deviceId,
+  }), [deviceId]);
+  useEffect(() => () => remoteWatch.stop(), [remoteWatch]);
+  // Nouveau serveur : les flux sont rouverts vers lui.
   useEffect(() => {
     remoteRef.current?.restart();
-  }, [client]);
+    remoteWatch.restart();
+  }, [client, remoteWatch]);
   useEffect(() => {
     const save = () => playback.saveNow();
     window.addEventListener('pagehide', save);
@@ -145,8 +154,9 @@ export function AppProvider({ settings: injected, playback: injectedPlayback, ch
     deviceLabel: deviceLabel(hostname),
     client,
     playback,
+    remoteWatch,
     navigation,
-  }), [settings, deviceId, hostname, client, playback, navigation]);
+  }), [settings, deviceId, hostname, client, playback, remoteWatch, navigation]);
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

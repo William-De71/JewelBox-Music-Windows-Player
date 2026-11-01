@@ -256,6 +256,23 @@ export class JewelBoxClient {
     });
   }
 
+  // ── Télécommande des autres lecteurs (serveur >= 1.18) ─────────────────────
+
+  // URL du flux des lecteurs (text/event-stream), lu par remoteWatch.js.
+  remoteWatchUrl() {
+    return serverUrl.apiUrl(this.baseUrl, '/api/player/remote/watch');
+  }
+
+  async remoteDevices() {
+    return parsing.parseRemoteDevices(await this._get('/api/player/remote/devices'));
+  }
+
+  // Un ordre pour un autre lecteur (core/remoteController.js), 202 une fois
+  // relayé ; il le confirme par son prochain rapport d'état.
+  async remoteCommand(deviceId, command) {
+    await this._post(`/api/player/remote/devices/${encodeURIComponent(deviceId)}/commands`, command);
+  }
+
   // ── Last.fm (204 même sans scrobbling configuré) ───────────────────────────
 
   async nowPlaying(trackId) { await this._post('/api/lastfm/nowplaying', { track_id: trackId }); }

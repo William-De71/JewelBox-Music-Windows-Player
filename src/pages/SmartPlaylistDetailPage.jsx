@@ -12,6 +12,7 @@ import { smartSpec } from '../core/smartSpecs.js';
 import { EmptyState } from '../ui/EmptyState.jsx';
 import { Icon } from '../ui/Icon.jsx';
 import { MenuButton } from '../ui/Menu.jsx';
+import { PlayOnButton } from '../ui/PlayOnButton.jsx';
 import { playableIndex, QueueTrackRow } from '../ui/QueueTrackRow.jsx';
 
 const pistes = (n) => (n === 1 ? '1 piste' : `${n} pistes`);
@@ -87,6 +88,7 @@ export function SmartPlaylistDetailPage({ smartKey }) {
                 <span class="button-text">{playingThis && playbackState.isPlaying ? 'Pause' : 'Écouter'}</span>
               </fluent-button>
             )}
+            {tracks.some((t) => t.hasFile) && <PlayOnButton type="smart" id={smartKey} />}
             {isDynamic && (
               <fluent-button onClick={() => runMix(() => client.dynamicMixRefresh(), false)} title="Relancer un mix complet">
                 <Icon name="arrow_clockwise" /><span class="button-text">Nouveau mix</span>

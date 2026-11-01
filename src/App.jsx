@@ -9,6 +9,8 @@ import { HomePage } from './pages/HomePage.jsx';
 import { LibraryPage } from './pages/LibraryPage.jsx';
 import { PlaylistDetailPage } from './pages/PlaylistDetailPage.jsx';
 import { PlaylistsPage } from './pages/PlaylistsPage.jsx';
+import { RemoteControlPage } from './pages/RemoteControlPage.jsx';
+import { RemoteDevicesPage } from './pages/RemoteDevicesPage.jsx';
 import { SearchPage } from './pages/SearchPage.jsx';
 import { SettingsPage } from './pages/SettingsPage.jsx';
 import { SmartPlaylistDetailPage } from './pages/SmartPlaylistDetailPage.jsx';
@@ -27,6 +29,8 @@ const STACK_PAGES = {
   playlist: (page) => <PlaylistDetailPage playlistId={page.id} />,
   smart: (page) => <SmartPlaylistDetailPage smartKey={page.id} />,
   player: () => <FullPlayerPage />,
+  remote: () => <RemoteDevicesPage />,
+  'remote-device': (page) => <RemoteControlPage deviceId={page.id} />,
 };
 
 export function App() {
