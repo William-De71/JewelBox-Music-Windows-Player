@@ -99,6 +99,8 @@ import GlobeRegular from '@fluentui/svg-icons/icons/globe_20_regular.svg?raw';
 import GlobeFilled from '@fluentui/svg-icons/icons/globe_20_filled.svg?raw';
 import CastRegular from '@fluentui/svg-icons/icons/cast_20_regular.svg?raw';
 import CastFilled from '@fluentui/svg-icons/icons/cast_20_filled.svg?raw';
+import HeadphonesRegular from '@fluentui/svg-icons/icons/headphones_20_regular.svg?raw';
+import HeadphonesFilled from '@fluentui/svg-icons/icons/headphones_20_filled.svg?raw';
 import RenameRegular from '@fluentui/svg-icons/icons/rename_20_regular.svg?raw';
 import RenameFilled from '@fluentui/svg-icons/icons/rename_20_filled.svg?raw';
 
@@ -203,4 +205,6 @@ export const ICONS = {
   'globe:filled': GlobeFilled,
   'cast': CastRegular,
   'cast:filled': CastFilled,
+  'headphones': HeadphonesRegular,
+  'headphones:filled': HeadphonesFilled,
 };

@@ -146,6 +146,11 @@ export function AppProvider({ settings: injected, playback: injectedPlayback, ch
     selectTab: (tab) => setNav({ tab, stack: [] }),
     push: (page) => setNav((current) => ({ ...current, stack: [...current.stack, page] })),
     pop: () => setNav((current) => ({ ...current, stack: current.stack.slice(0, -1) })),
+    // Empile page après avoir retiré de la pile les fiches de ces sortes.
+    pushReplacing: (page, kinds) => setNav((current) => ({
+      ...current,
+      stack: [...current.stack.filter((p) => !kinds.includes(p.kind)), page],
+    })),
   }), [nav]);
 
   const value = useMemo(() => ({

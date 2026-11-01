@@ -2,6 +2,7 @@
 // lecture d'un album depuis une carte (les cartes n'ont pas les pistes).
 
 import { resumeStart } from '../core/queueSync.js';
+import { takeOverQueue } from '../core/remoteController.js';
 import { smartSpec } from '../core/smartSpecs.js';
 import { AddToPlaylistDialog } from '../ui/AddToPlaylistDialog.jsx';
 import { useApp } from './context.jsx';
@@ -57,12 +58,13 @@ export function useActions() {
   }
 
   // Charge la file d'un autre appareil et la lance à la même piste, à la même
-  // position. Rend 'ok', 'empty' (rien de jouable) ou 'error'.
-  async function resumeDevice(device) {
+  // position — celles de liveState (« Écouter ici ») quand il correspond à la
+  // file. Rend 'ok', 'empty' (rien de jouable) ou 'error'.
+  async function resumeDevice(device, liveState = null) {
     if (!client) return 'error';
     let queue;
     try {
-      queue = await client.deviceQueue(device.deviceId);
+      queue = takeOverQueue(await client.deviceQueue(device.deviceId), liveState, Date.now());
     } catch {
       return 'error';
     }

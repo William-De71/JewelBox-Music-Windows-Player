@@ -53,6 +53,21 @@ export function nextRepeat(mode) {
   return 'all';
 }
 
+// « Écouter ici » : la file que ce lecteur a laissée sur le serveur, calée
+// sur où il en est maintenant. Sa piste et sa position en direct sont plus
+// fraîches que celles enregistrées (toutes les 30 s environ en lecture) ; on
+// garde ces dernières si le direct ne correspond pas à la file (un
+// changement pas encore enregistré).
+export function takeOverQueue(queue, state, now) {
+  if (state?.trackId == null) return queue;
+  const idAt = (index) => queue.tracks[index]?.id;
+  let index;
+  if (idAt(state.currentIndex) === state.trackId) index = state.currentIndex;
+  else if (idAt(queue.currentIndex) === state.trackId) index = queue.currentIndex;
+  else return queue;
+  return { ...queue, currentIndex: index, positionSec: livePosition(state, now) };
+}
+
 // Icône d'après le nom que le lecteur s'est donné (« JewelBox Android ·
 // modèle », « JewelBox bureau · hôte », un navigateur…).
 export function deviceIcon(label) {
