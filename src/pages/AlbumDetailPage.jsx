@@ -3,6 +3,7 @@
 // entier ; pistes avec lecture, favori et menu. Un clic sur la piste en cours
 // bascule lecture/pause au lieu de la relancer.
 
+import { Fragment } from 'preact';
 import { useEffect, useState } from 'preact/hooks';
 
 import { useActions } from '../app/actions.jsx';
@@ -115,6 +116,8 @@ export function AlbumDetailPage({ albumId }) {
   const meta = [album.year, album.genre, album.label?.name, album.totalDuration].filter(Boolean).join(' · ');
   const hasPlayable = album.tracks.some((t) => t.hasFile);
   const firstPlayable = album.tracks.find((t) => t.hasFile);
+  // Plusieurs CD : un intertitre « CD n » au-dessus des pistes de chacun.
+  const multiDisc = new Set(album.tracks.map((t) => t.disc)).size > 1;
   const playingThisAlbum = playbackState.sourceType === 'album' && playbackState.sourceId === String(album.id);
 
   return (
@@ -154,15 +157,22 @@ export function AlbumDetailPage({ albumId }) {
         </div>
       </header>
       <div class="track-list" role="table" aria-label="Pistes">
-        {album.tracks.map((track) => (
-          <TrackRow
-            key={track.id}
-            album={album}
-            track={track}
-            isCurrent={playbackState.currentTrackId === track.id}
-            isPlaying={playbackState.isPlaying}
-            onFavorite={toggleFavorite}
-          />
+        {album.tracks.map((track, index) => (
+          <Fragment key={track.id}>
+            {multiDisc && track.disc !== album.tracks[index - 1]?.disc && (
+              <div class="track-list__disc" role="row">
+                <Icon name="album" size={16} />
+                <span>CD {track.disc}</span>
+              </div>
+            )}
+            <TrackRow
+              album={album}
+              track={track}
+              isCurrent={playbackState.currentTrackId === track.id}
+              isPlaying={playbackState.isPlaying}
+              onFavorite={toggleFavorite}
+            />
+          </Fragment>
         ))}
       </div>
     </div>

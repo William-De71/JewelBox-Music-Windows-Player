@@ -10,7 +10,7 @@ const FULL_ALBUM = {
   tracks: [
     { id: 71, position: 1, title: 'La femme d’argent', duration: '7:11', has_file: true, play_count: 4, is_favorite: true,
       replaygain: { track_gain: -6.5, track_peak: 0.98, album_gain: -7.1, album_peak: 1 } },
-    { id: 72, position: 2, title: 'Sexy Boy', duration: '4:58' },
+    { id: 72, disc: 2, position: 2, title: 'Sexy Boy', duration: '4:58' },
   ],
 };
 
@@ -46,6 +46,8 @@ describe('album', () => {
     expect(album.tracks[0]).toMatchObject({ isFavorite: true, playCount: 4 });
     expect(album.tracks[0].replayGain).toEqual({ trackGain: -6.5, trackPeak: 0.98, albumGain: -7.1, albumPeak: 1 });
     expect(album.tracks[1]).toMatchObject({ hasFile: false, playCount: 0, isFavorite: false, replayGain: null });
+    // CD de la piste : 1 quand le serveur ne le donne pas (< 1.26).
+    expect(album.tracks.map((t) => t.disc)).toEqual([1, 2]);
   });
   it('champs optionnels null', () => {
     const album = parsing.parseAlbum({ id: 1, title: 'X', artist: { id: 1, name: 'Y' }, year: null, label: null, tracks: null });
