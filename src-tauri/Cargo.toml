@@ -1,6 +1,6 @@
 [package]
 name = "jewelbox"
-version = "0.4.0"
+version = "0.5.0"
 description = "JewelBox Music Player pour Windows"
 authors = ["William Deren"]
 license = "MIT"
