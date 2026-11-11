@@ -125,7 +125,7 @@ export function AlbumDetailPage({ albumId }) {
       <header class="album-detail__header">
         <Cover url={client.resolveCover(album.coverUrl)} size={232} alt={`Pochette de ${album.title}`} class="cover--shadow" />
         <div class="album-detail__info">
-          <span class="album-detail__kind">Album</span>
+          <span class="album-detail__kind">{album.isWanted ? 'Album · Liste de souhaits' : 'Album'}</span>
           <h1 class="album-detail__title">{album.title}</h1>
           <div class="album-detail__artist">{album.artist.name}</div>
           {meta && <div class="album-detail__meta">{meta}</div>}

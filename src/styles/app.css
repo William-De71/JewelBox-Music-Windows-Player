@@ -343,6 +343,18 @@ fluent-button .icon { margin: 0; }
 }
 
 .album-card__open:hover { background: var(--subtle-hover); }
+/* Album de la liste de souhaits (écoutable, CD pas encore possédé). */
+.album-card__wanted {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: var(--colorBrandBackground);
+  color: var(--colorNeutralForegroundOnBrand);
+  font-size: 11px;
+  font-weight: 600;
+}
 .album-card__open .cover { width: 100%; margin-bottom: 8px; }
 .album-card__title, .album-card__artist { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .album-card__title { font-weight: 600; }

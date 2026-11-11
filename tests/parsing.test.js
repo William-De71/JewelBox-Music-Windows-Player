@@ -5,7 +5,7 @@ import { ParseError } from '../src/api/parsing.js';
 const FULL_ALBUM = {
   id: 7, title: 'Moon Safari', year: 1998, genre: 'Electro', rating: 5,
   total_duration: '43:47', ean: '724384497820', notes: 'Édition originale',
-  cover_url: '/covers/7.jpg', has_audio: true,
+  cover_url: '/covers/7.jpg', has_audio: true, is_wanted: true,
   artist: { id: 3, name: 'Air' }, label: { id: 2, name: 'Virgin' },
   tracks: [
     { id: 71, position: 1, title: 'La femme d’argent', duration: '7:11', has_file: true, play_count: 4, is_favorite: true,
@@ -42,6 +42,7 @@ describe('album', () => {
     expect(album).toMatchObject({ id: 7, title: 'Moon Safari', year: 1998, coverUrl: '/covers/7.jpg', hasAudio: true });
     expect(album.artist).toEqual({ id: 3, name: 'Air' });
     expect(album.label).toEqual({ id: 2, name: 'Virgin' });
+    expect(album.isWanted).toBe(true);
     expect(album.tracks).toHaveLength(2);
     expect(album.tracks[0]).toMatchObject({ isFavorite: true, playCount: 4 });
     expect(album.tracks[0].replayGain).toEqual({ trackGain: -6.5, trackPeak: 0.98, albumGain: -7.1, albumPeak: 1 });

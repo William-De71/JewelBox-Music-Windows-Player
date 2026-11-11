@@ -81,10 +81,12 @@ export class JewelBoxClient {
 
   // ── Bibliothèque ───────────────────────────────────────────────────────────
 
-  // Page d'albums possédés (wanted=false exclut la liste de souhaits). Tri
-  // artist : le serveur ajoute l'année en clé secondaire.
+  // Page d'albums possédés (wanted=false exclut la liste de souhaits), plus
+  // ceux de la liste de souhaits qui ont des fichiers audio (playable_wanted,
+  // serveur >= 1.27 ; ignoré avant). Tri artist : le serveur ajoute l'année en
+  // clé secondaire.
   async albums({ page = 1, limit = 24, sort = 'artist', order = 'asc', genre } = {}) {
-    const query = { page, limit, sort, order, wanted: false, genre: genre || undefined };
+    const query = { page, limit, sort, order, wanted: false, playable_wanted: true, genre: genre || undefined };
     return parsing.parseAlbumsPage(await this._get('/api/albums', query));
   }
 
