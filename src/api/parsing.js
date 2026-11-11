@@ -76,6 +76,9 @@ export function parseTrack(data) {
   return {
     id: reqInt(data, 'id', 'track'),
     title: reqStr(data, 'title', 'track'),
+    // Le CD de la piste dans un album qui en compte plusieurs ; 1 sur un
+    // serveur < 1.26, qui ne connaît qu'un CD par album.
+    disc: int(data, 'disc') || 1,
     position: int(data, 'position'),
     duration: optStr(data, 'duration'),
     hasFile: bool(data, 'has_file'),

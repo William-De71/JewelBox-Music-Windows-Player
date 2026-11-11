@@ -468,6 +468,9 @@ fluent-button .icon { margin: 0; }
 .album-detail__actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
 
 .track-list { display: flex; flex-direction: column; gap: 2px; }
+/* Album sur plusieurs CD : intertitre au-dessus des pistes de chaque CD. */
+.track-list__disc { display: flex; align-items: center; gap: 8px; padding: 14px 8px 6px; font-weight: 600; color: var(--text-secondary); }
+.track-list__disc:first-child { padding-top: 0; }
 
 .track-row {
   display: grid;
