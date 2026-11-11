@@ -38,7 +38,7 @@ describe('JewelBoxClient', () => {
     const fetchImpl = fakeFetch(200, '{"data":[],"pagination":{}}');
     const client = new JewelBoxClient('http://s:3001', { fetchImpl });
     await client.albums({ page: 2 });
-    expect(fetchImpl.mock.calls[0][0]).toBe('http://s:3001/api/albums?page=2&limit=24&sort=artist&order=asc&wanted=false');
+    expect(fetchImpl.mock.calls[0][0]).toBe('http://s:3001/api/albums?page=2&limit=24&sort=artist&order=asc&wanted=false&playable_wanted=true');
     await client.albums({ genre: 'Jazz' });
     expect(fetchImpl.mock.calls[1][0]).toContain('&genre=Jazz');
   });

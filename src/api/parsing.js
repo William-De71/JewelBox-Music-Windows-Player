@@ -102,6 +102,9 @@ export function parseAlbum(data) {
     notes: optStr(data, 'notes'),
     coverUrl: optStr(data, 'cover_url'),
     hasAudio: bool(data, 'has_audio'),
+    // Album de la liste de souhaits : le CD n'est pas possédé, mais ses
+    // fichiers peuvent être là (acheté en MP3) et se lire comme les autres.
+    isWanted: bool(data, 'is_wanted'),
     label: isObject(data.label) ? parseLabel(data.label) : null,
     // Présent uniquement sur le détail (GET /api/albums/:id) ; vide en liste.
     tracks: list(data, 'tracks').map(parseTrack),

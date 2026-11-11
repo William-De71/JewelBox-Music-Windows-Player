@@ -26,6 +26,7 @@ export function AlbumCard({ album, onOpen }) {
     <div class="album-card" role="listitem">
       <button type="button" class="album-card__open" onClick={() => onOpen(album.id)} title={album.title}>
         <Cover url={client?.resolveCover(album.coverUrl)} alt="" />
+        {album.isWanted && <span class="album-card__wanted">Souhait</span>}
         <span class="album-card__title">{album.title}</span>
         <span class="album-card__artist">{album.artist.name}</span>
       </button>
